@@ -20,9 +20,11 @@ package org.apache.celeborn.plugin.flink;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.runtime.checkpoint.channel.InputChannelInfo;
 import org.apache.flink.runtime.deployment.InputGateDeploymentDescriptor;
 import org.apache.flink.runtime.event.TaskEvent;
@@ -32,6 +34,8 @@ import org.apache.flink.runtime.io.network.buffer.BufferPool;
 import org.apache.flink.runtime.io.network.partition.consumer.BufferOrEvent;
 import org.apache.flink.runtime.io.network.partition.consumer.IndexedInputGate;
 import org.apache.flink.runtime.io.network.partition.consumer.InputChannel;
+import org.apache.flink.runtime.metrics.groups.ShuffleIOMetricGroup;
+import org.apache.flink.runtime.shuffle.ShuffleIOOwnerContext;
 import org.apache.flink.util.FlinkRuntimeException;
 import org.apache.flink.util.function.SupplierWithException;
 
@@ -44,24 +48,27 @@ public abstract class AbstractRemoteShuffleInputGate extends IndexedInputGate {
 
   public AbstractRemoteShuffleInputGate(
       CelebornConf celebornConf,
-      String taskName,
+      ShuffleIOOwnerContext ownerContext,
       int gateIndex,
       InputGateDeploymentDescriptor gateDescriptor,
       SupplierWithException<BufferPool, IOException> bufferPoolFactory,
       BufferDecompressor bufferDecompressor,
-      int numConcurrentReading) {
+      int numConcurrentReading,
+      Map<Integer, ShuffleIOMetricGroup> shuffleIOMetricGroups) {
+    Tuple2<Integer, Integer> indexRange = getConsumedSubpartitionIndexRange(gateDescriptor);
     inputGateDelegation =
         new RemoteShuffleInputGateDelegation(
             celebornConf,
-            taskName,
+            ownerContext,
             gateIndex,
             gateDescriptor,
             bufferPoolFactory,
             bufferDecompressor,
             numConcurrentReading,
             availabilityHelper,
-            gateDescriptor.getConsumedSubpartitionIndexRange().getStartIndex(),
-            gateDescriptor.getConsumedSubpartitionIndexRange().getEndIndex());
+            indexRange.f0,
+            indexRange.f1,
+            shuffleIOMetricGroups);
   }
 
   /** Setup gate and build network connections. */
@@ -159,6 +166,10 @@ public abstract class AbstractRemoteShuffleInputGate extends IndexedInputGate {
     throw new FlinkRuntimeException("Method should not be called.");
   }
 
+  public void resumeGateConsumption() throws IOException {
+    throw new FlinkRuntimeException("Method should not be called.");
+  }
+
   @Override
   public void resumeConsumption(InputChannelInfo channelInfo) {
     throw new FlinkRuntimeException("Method should not be called.");
@@ -180,4 +191,7 @@ public abstract class AbstractRemoteShuffleInputGate extends IndexedInputGate {
         inputGateDelegation.getGateIndex(),
         inputGateDelegation.getGateDescriptor().toString());
   }
+
+  public abstract Tuple2<Integer, Integer> getConsumedSubpartitionIndexRange(
+      InputGateDeploymentDescriptor gateDescriptor);
 }

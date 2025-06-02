@@ -23,7 +23,17 @@ license: |
 
 # Upgrading from 0.5 to 0.6
 
-- Since 0.6.0, Celeborn changed the default value of `celeborn.master.slot.assign.extraSlots` from `2` to `100`, which means Celeborn will involve more workers in offering slots.
+- Since 0.6.0, Celeborn modified `celeborn.quota.tenant.diskBytesWritten` to `celeborn.quota.user.diskBytesWritten`. Please use `celeborn.quota.user.diskBytesWritten` if you want to set user level quota.
+
+- Since 0.6.0, Celeborn modified `celeborn.quota.tenant.diskFileCount` to `celeborn.quota.user.diskFileCount`. Please use `celeborn.quota.user.diskFileCount` if you want to set user level quota.
+
+- Since 0.6.0, Celeborn modified `celeborn.quota.tenant.hdfsBytesWritten` to `celeborn.quota.user.hdfsBytesWritten`. Please use `celeborn.quota.user.hdfsBytesWritten` if you want to set user level quota.
+
+- Since 0.6.0, Celeborn modified `celeborn.quota.tenant.hdfsFileCount` to `celeborn.quota.user.hdfsFileCount`. Please use `celeborn.quota.user.hdfsFileCount` if you want to set user level quota.
+
+- Since 0.6.0, Celeborn modified `celeborn.master.hdfs.expireDirs.timeout` to `celeborn.master.dfs.expireDirs.timeout`. Please use `cceleborn.master.dfs.expireDirs.timeout` if you want to set timeout for an expired dirs to be deleted.
+
+- Since 0.6.0, Celeborn introduced `celeborn.master.slot.assign.minWorkers` with default value of `100`, which means Celeborn will involve more workers in offering slots when number of reducers are less.
 
 - Since 0.6.0, Celeborn deprecate `celeborn.worker.congestionControl.low.watermark`. Please use `celeborn.worker.congestionControl.diskBuffer.low.watermark` instead.
 
@@ -32,6 +42,8 @@ license: |
 - Since 0.6.0, Celeborn changed the default value of `celeborn.client.spark.fetch.throwsFetchFailure` from `false` to `true`, which means Celeborn will enable spark stage rerun at default.
 
 - Since 0.6.0, Celeborn changed `celeborn.<module>.io.mode` optional, of which the default value changed from `NIO` to `EPOLL` if epoll mode is available, falling back to `NIO` otherwise.
+
+- Since 0.6.0, Celeborn removed `celeborn.client.shuffle.mapPartition.split.enabled` to enable shuffle partition split at default for MapPartition.
 
 - Since 0.6.0, Celeborn has introduced a new RESTful API namespace: /api/v1, which uses the application/json media type for requests and responses.
    The `celeborn-openapi-client` SDK is also available to help users interact with the new RESTful APIs.
@@ -78,7 +90,7 @@ license: |
 
 - Since 0.6.0, the RESTful api `/listTopDiskUsedApps` both in Master and Worker has been removed. Please use the following PromQL query instead.
   ```text
-  topK(50, sum by (applicationId) (metrics_diskBytesWritten_Value{role="worker", applicationId!=""}))
+  topK(50, sum by (applicationId) (metrics_diskBytesWritten_Value{role="Worker", applicationId!=""}))
   ```
 
 - Since 0.6.0, the out-of-dated Flink 1.14 and Flink 1.15 have been removed from the official support list.

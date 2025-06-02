@@ -34,7 +34,7 @@ Celeborn CLI is the command line interface of Celeborn including the management 
 ## Setup
 
 To get the binary package `apache-celeborn-<VERSION>-bin.tgz`, download the pre-built binary tarball from [Download](https://celeborn.apache.org/download) or
-the source tarball from [Download](https://celeborn.apache.org/download) for building Celeborn according to [Build](https://celeborn.apache.org/community/contributor_guide/build_and_test/).
+the source tarball from [Download](https://celeborn.apache.org/download) for building Celeborn according to [Build](https://github.com/apache/celeborn?tab=readme-ov-file#build).
 
 After getting the binary package `apache-celeborn-<VERSION>-bin.tgz`:
 
@@ -83,8 +83,8 @@ Usage: celeborn-cli master [-hV] [--apps=appId] [--cluster=cluster_alias]
                            [--config-tenant=tenant_id] [--host-list=h1,h2,
                            h3...] [--hostport=host:port] [--worker-ids=w1,w2,
                            w3...] (--show-masters-info | --show-cluster-apps |
-                           --show-cluster-shuffles | --show-top-disk-used-apps
-                           | --exclude-worker | --remove-excluded-worker |
+                           --show-cluster-shuffles | --exclude-worker |
+                           --remove-excluded-worker |
                            --send-worker-event=IMMEDIATELY | DECOMMISSION | 
                            DECOMMISSION_THEN_IDLE | GRACEFUL | RECOMMISSION | 
                            NONE | --show-worker-event-info |
@@ -93,9 +93,9 @@ Usage: celeborn-cli master [-hV] [--apps=appId] [--cluster=cluster_alias]
                            --show-shutdown-workers |
                            --show-decommissioning-workers |
                            --show-lifecycle-managers | --show-workers |
-                           --show-conf | --show-dynamic-conf |
-                           --show-thread-dump | --show-container-info |
-                           --add-cluster-alias=alias |
+                           --show-workers-topology | --show-conf |
+                           --show-dynamic-conf | --show-thread-dump |
+                           --show-container-info | --add-cluster-alias=alias |
                            --remove-cluster-alias=alias |
                            --remove-workers-unavailable-info |
                            --revise-lost-shuffles | --delete-apps)
@@ -103,6 +103,11 @@ Usage: celeborn-cli master [-hV] [--apps=appId] [--cluster=cluster_alias]
       --add-cluster-alias=alias
                              Add alias to use in the cli for the given set of
                                masters
+      --auth-header=authHeader
+                             The http `Authorization` header for
+                               authentication. It should be in the format of
+                               `Bearer <token>` or `Basic
+                               <base64-encoded-credentials>`.
       --apps=appId           The application Id list seperated by comma.
       --cluster=cluster_alias
                              The alias of the cluster to use to query masters
@@ -148,11 +153,11 @@ Usage: celeborn-cli master [-hV] [--apps=appId] [--cluster=cluster_alias]
       --show-shutdown-workers
                              Show shutdown workers
       --show-thread-dump     Show master thread dump
-      --show-top-disk-used-apps
-                             Show top disk used apps
       --show-worker-event-info
                              Show worker event information
       --show-workers         Show registered workers
+      --show-workers-topology
+                             Show registered workers topology
       --shuffleIds=<shuffleIds>
                              The shuffle ids to manipulate.
   -V, --version              Print version information and exit.
@@ -172,7 +177,6 @@ Usage: celeborn-cli worker [-hV] [--apps=appId] [--cluster=cluster_alias]
                            h3...] [--hostport=host:port] [--worker-ids=w1,w2,
                            w3...] (--show-worker-info | --show-apps-on-worker |
                            --show-shuffles-on-worker |
-                           --show-top-disk-used-apps |
                            --show-partition-location-info |
                            --show-unavailable-peers | --is-shutdown |
                            --is-decommissioning | --is-registered |
@@ -180,6 +184,11 @@ Usage: celeborn-cli worker [-hV] [--apps=appId] [--cluster=cluster_alias]
                            --show-container-info | --show-dynamic-conf |
                            --show-thread-dump)
       --apps=appId           The application Id list seperated by comma.
+      --auth-header=authHeader
+                             The http `Authorization` header for
+                               authentication. It should be in the format of
+                               `Bearer <token>` or `Basic
+                               <base64-encoded-credentials>`.
       --cluster=cluster_alias
                              The alias of the cluster to use to query masters
       --config-level=level   The config level of the dynamic configs
@@ -203,8 +212,6 @@ Usage: celeborn-cli worker [-hV] [--apps=appId] [--cluster=cluster_alias]
       --show-shuffles-on-worker
                              Show shuffles running on the worker
       --show-thread-dump     Show worker thread dump
-      --show-top-disk-used-apps
-                             Show top disk used applications
       --show-unavailable-peers
                              Show unavailable peers
       --show-worker-info     Show worker info
